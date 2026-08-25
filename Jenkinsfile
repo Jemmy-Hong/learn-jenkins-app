@@ -33,7 +33,8 @@ pipeline {
             steps {
                 sh '''
                     test -f build/index.html
-                    npm test
+                    mkdir -p test-results
+                    JEST_JUNIT_OUTPUT_DIR=test-results JEST_JUNIT_OUTPUT_NAME=jest-results.xml npm test
                 '''
             }
         }
