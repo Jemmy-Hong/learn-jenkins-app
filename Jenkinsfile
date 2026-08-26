@@ -67,15 +67,16 @@ pipeline {
     post {
         always {
             script {
-                def reportFiles = findFiles(glob: 'test-results/*.xml')
-                echo "检测报告列表: ${reportFiles}"
-                if (reportFiles.length > 0) {
+                // 打印目录看文件情况
+                sh '''
+                    ls -la test-results/ || echo "test-results目录不存在"
+                '''
+                // catchError捕获junit找不到文件的错误，不会让整个流水线失败
+                catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
                     junit(
                         testResults: 'test-results/*.xml',
                         allowEmptyResults: true
                     )
-                } else {
-                    echo "警告：未找到任何junit测试报告，跳过junit收集，不导致构建失败"
                 }
             }
         }
