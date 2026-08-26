@@ -51,7 +51,7 @@ pipeline {
                     npm install
                     npx serve -s build -l 3000 &
                     npx wait-on http://localhost:3000
-                    npx playwright test --reporter=html
+                    npx playwright test --reporter=html --reporter=junit:test-results/playwright-results.xml
                 '''
             }
         }
