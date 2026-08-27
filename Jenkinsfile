@@ -23,7 +23,6 @@ pipeline {
         }
         */
 
-        // ⚠️修复：关键字stage小写！！
         stage('Tests') {
             parallel {
                 stage('Unit Tests') {
@@ -87,6 +86,21 @@ pipeline {
                         }
                     }
                 }
+            }
+        }
+
+        stage('Deploy') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+                sh '''
+                    npm install netlify-cli -g
+                    node_modules/.bin/netlify --version
+                '''
             }
         }
     }
