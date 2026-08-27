@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        // site_id 也放到jenkins凭证，不要硬编码到代码
         NETLIFY_SITE_ID = '51ca60ee-a888-4f68-b6cb-3f513b046a1b'
         NETLIFY_AUTH_TOKEN = credentials('netlify-token')
     }
@@ -24,6 +25,12 @@ pipeline {
                     ls -la
                 '''
             }
+            post {
+                always {
+                    // 关键：把build产物打包缓存，跨stage传递
+                    stash includes: 'build/**', name: 'build-artifact'
+                }
+            }
         }
 
         stage('Tests') {
@@ -36,6 +43,8 @@ pipeline {
                         }
                     }
                     steps {
+                        // 拿到build产物
+                        unstash 'build-artifact'
                         sh '''
                             test -f build/index.html
                             mkdir -p test-results
@@ -49,8 +58,8 @@ pipeline {
                                     ls -la test-results/ || echo "test-results目录不存在"
                                 '''
                                 junit(
-                                    testResults: 'test-results/*.xml',
-                                    allowEmptyResults: true
+                                        testResults: 'test-results/*.xml',
+                                        allowEmptyResults: true
                                 )
                             }
                         }
@@ -65,6 +74,7 @@ pipeline {
                         }
                     }
                     steps {
+                        unstash 'build-artifact'
                         sh '''
                             npm install
                             mkdir -p test-results
@@ -76,15 +86,15 @@ pipeline {
                     post {
                         always {
                             publishHTML([
-                                allowMissing: true,
-                                alwaysLinkToLastBuild: false,
-                                icon: '',
-                                keepAll: true,
-                                reportDir: 'playwright-report',
-                                reportFiles: 'index.html',
-                                reportName: 'Playwright HTML Report',
-                                reportTitles: '',
-                                useWrapperFileDirectly: true
+                                    allowMissing: true,
+                                    alwaysLinkToLastBuild: false,
+                                    icon: '',
+                                    keepAll: true,
+                                    reportDir: 'playwright-report',
+                                    reportFiles: 'index.html',
+                                    reportName: 'Playwright HTML Report',
+                                    reportTitles: '',
+                                    useWrapperFileDirectly: true
                             ])
                         }
                     }
@@ -100,13 +110,16 @@ pipeline {
                 }
             }
             steps {
+                // 解压拿到build目录！！
+                unstash 'build-artifact'
                 sh '''
                     npm config set registry https://registry.npmmirror.com
                     npm install netlify-cli
                     npx netlify --version
                     echo "Deploying to Production. Site ID: ${NETLIFY_SITE_ID}"
                     npx netlify status
-                    npx netlify deploy --dir=build --prod
+                    # --no-build 禁止netlify重新执行构建，直接上传本地build文件夹
+                    npx netlify deploy --dir=build --prod --no-build
                 '''
             }
         }
