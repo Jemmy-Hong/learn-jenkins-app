@@ -101,6 +101,7 @@ pipeline {
             }
             steps {
                 sh '''
+                    npm config set registry https://registry.npmmirror.com
                     npm install netlify-cli
                     npx netlify --version
                     echo "Deploying to Production. Site ID: ${NETLIFY_SITE_ID}"
