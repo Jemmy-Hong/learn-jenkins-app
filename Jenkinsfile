@@ -1,7 +1,6 @@
 pipeline {
     agent any
 
-
     stages {
         /*
         stage('Build') {
@@ -21,10 +20,11 @@ pipeline {
                     ls -la
                 '''
             }
-        }*/
+        }
+        */
 
-
-        Stage('Tests'){
+        // ⚠️修复：关键字stage小写！！
+        stage('Tests') {
             parallel {
                 stage('Unit Tests') {
                     agent {
@@ -33,7 +33,6 @@ pipeline {
                             reuseNode true
                         }
                     }
-
                     steps {
                         sh '''
                             test -f build/index.html
@@ -41,21 +40,16 @@ pipeline {
                             JEST_JUNIT_OUTPUT_DIR=test-results JEST_JUNIT_OUTPUT_NAME=jest-results.xml npm test
                         '''
                     }
-
                     post {
                         always {
                             script {
-                                // 打印目录看文件情况
                                 sh '''
                                     ls -la test-results/ || echo "test-results目录不存在"
                                 '''
-                                // catchError捕获junit找不到文件的错误，不会让整个流水线失败
-                                catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
-                                    junit(
-                                        testResults: 'test-results/*.xml',
-                                        allowEmptyResults: true
-                                    )
-                                }
+                                junit(
+                                    testResults: 'test-results/*.xml',
+                                    allowEmptyResults: true
+                                )
                             }
                         }
                     }
@@ -76,19 +70,24 @@ pipeline {
                             npx wait-on http://localhost:3000
                             PLAYWRIGHT_JUNIT_OUTPUT_FILE=test-results/playwright-results.xml npx playwright test --reporter html --reporter junit
                         '''
-                    }                    
-                    
+                    }
                     post {
                         always {
-                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, icon: '', keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+                            publishHTML([
+                                allowMissing: true,
+                                alwaysLinkToLastBuild: false,
+                                icon: '',
+                                keepAll: true,
+                                reportDir: 'playwright-report',
+                                reportFiles: 'index.html',
+                                reportName: 'Playwright HTML Report',
+                                reportTitles: '',
+                                useWrapperFileDirectly: true
+                            ])
                         }
                     }
                 }
             }
         }
-
     }
-
-
-    
 }
