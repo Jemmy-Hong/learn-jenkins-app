@@ -21,6 +21,7 @@ pipeline {
                     ls -la
                     node --version
                     npm --version
+                    npm config set registry https://registry.npmmirror.com
                     npm ci
                     npm run build
                     ls -la
@@ -77,6 +78,7 @@ pipeline {
                     steps {
                         unstash 'build-artifact'
                         sh '''
+                            npm config set registry https://registry.npmmirror.com
                             npm install
                             mkdir -p test-results
                             npx serve -s build -l 3000 &
@@ -102,7 +104,6 @@ pipeline {
                 }
             }
         }
-
 
         stage('Deploy staging') {
             agent {
@@ -148,7 +149,6 @@ pipeline {
             }
         }
 
-
         stage('Prod E2E') {
             agent {
                 docker {
@@ -161,11 +161,12 @@ pipeline {
                 CI_ENVIRONMENT_URL = 'https://sensational-semifreddo-386a48.netlify.app/'
             }
 
-
             steps {
                 unstash 'build-artifact'
                 sh '''
-                    PLAYWRIGHT_JUNIT_OUTPUT_FILE=test-results/playwright-results.xml npx playwright test --reporter html --reporter junit
+                    npm config set registry https://registry.npmmirror.com
+                    npm install
+                    PLAYWRIGHT_JUNIT_OUTPUT_FILE=test-results/playwright-results.xml npx playwright test --reporter=html,junit
                 '''
             }
             post {
@@ -184,6 +185,5 @@ pipeline {
                 }
             }
         }
-
     }
 }
