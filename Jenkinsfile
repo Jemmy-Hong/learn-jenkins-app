@@ -122,13 +122,13 @@ pipeline {
                 unstash 'build-artifact'
                 sh '''
                     npm config set registry https://registry.npmmirror.com
-                    npm install netlify-cli node-jq
+                    npm install netlify-cli@17.36.1 node-jq
                     npx netlify --version
                     echo "Deploying to Staging. Site ID: ${NETLIFY_SITE_ID}"
                     npx netlify status
                     # --no-build 禁止netlify重新执行构建，直接上传本地build文件夹
                     npx netlify deploy --dir=build --no-build --json > deploy-output.json
-                    CI_ENVIRONMENT_URL = $(npx node-jq -r '.deploy_url' deploy-output.json)
+                    CI_ENVIRONMENT_URL=$(npx node-jq -r '.deploy_url' deploy-output.json)
                     PLAYWRIGHT_JUNIT_OUTPUT_FILE=test-results/playwright-results.xml npx playwright test --reporter=html,junit
                 '''
             }
@@ -170,7 +170,7 @@ pipeline {
                 unstash 'build-artifact'
                 sh '''
                     npm config set registry https://registry.npmmirror.com
-                    npm install netlify-cli
+                    npm install netlify-cli@17.36.1
                     npx netlify --version
                     echo "Deploying to Production. Site ID: ${NETLIFY_SITE_ID}"
                     npx netlify status
