@@ -103,7 +103,30 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+
+        stage('Deploy staging') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+                // 解压拿到build目录！！
+                unstash 'build-artifact'
+                sh '''
+                    npm config set registry https://registry.npmmirror.com
+                    npm install netlify-cli
+                    npx netlify --version
+                    echo "Deploying to Staging. Site ID: ${NETLIFY_SITE_ID}"
+                    npx netlify status
+                    # --no-build 禁止netlify重新执行构建，直接上传本地build文件夹
+                    npx netlify deploy --dir=build --no-build
+                '''
+            }
+        }
+
+        stage('Deploy prod') {
             agent {
                 docker {
                     image 'node:18-alpine'
