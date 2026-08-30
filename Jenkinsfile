@@ -125,6 +125,46 @@ pipeline {
                     npx netlify deploy --dir=build --no-build --json > deploy-output.json
                     npx node-jq -r '.deploy_url' deploy-output.json
                 '''
+                script {
+                    env.STAGING_URL = sh(script: "npx node-jq -r '.deploy_url' deploy-output.json", returnStdout: true)
+                }
+            }
+        }
+
+        stage('Staging E2E') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    reuseNode true
+                }
+            }
+
+            environment {
+                CI_ENVIRONMENT_URL = "${env.STAGING_URL}"
+            }
+
+            steps {
+                unstash 'build-artifact'
+                sh '''
+                    npm config set registry https://registry.npmmirror.com
+                    npm install
+                    PLAYWRIGHT_JUNIT_OUTPUT_FILE=test-results/playwright-results.xml npx playwright test --reporter=html,junit
+                '''
+            }
+            post {
+                always {
+                    publishHTML([
+                            allowMissing: true,
+                            alwaysLinkToLastBuild: false,
+                            icon: '',
+                            keepAll: true,
+                            reportDir: 'playwright-report',
+                            reportFiles: 'index.html',
+                            reportName: 'Playwright Staging E2E Report',
+                            reportTitles: '',
+                            useWrapperFileDirectly: true
+                    ])
+                }
             }
         }
 
@@ -187,7 +227,7 @@ pipeline {
                             keepAll: true,
                             reportDir: 'playwright-report',
                             reportFiles: 'index.html',
-                            reportName: 'Playwright E2E Report',
+                            reportName: 'Playwright Prod E2E Report',
                             reportTitles: '',
                             useWrapperFileDirectly: true
                     ])
