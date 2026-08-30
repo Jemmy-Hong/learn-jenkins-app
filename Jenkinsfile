@@ -122,7 +122,8 @@ pipeline {
                     echo "Deploying to Staging. Site ID: ${NETLIFY_SITE_ID}"
                     npx netlify status
                     # --no-build 禁止netlify重新执行构建，直接上传本地build文件夹
-                    npx netlify deploy --dir=build --no-build
+                    npx netlify deploy --dir=build --no-build --json > deploy-output.json
+                    npx node-jq -r '.deploy_url' deploy-output.json
                 '''
             }
         }
