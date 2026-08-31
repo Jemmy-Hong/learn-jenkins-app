@@ -113,12 +113,7 @@ pipeline {
                 }
             }
 
-            environment {
-                CI_ENVIRONMENT_URL = 'STAGING_URL_TO_BE_SET'
-            }
-
             steps {
-                // 解压拿到build目录！！
                 unstash 'build-artifact'
                 sh '''
                     npm config set registry https://registry.npmmirror.com
@@ -133,6 +128,10 @@ pipeline {
                 '''
             }
 
+            // script {
+            //     env.CI_ENVIRONMENT_URL = sh(script: "npx node-jq -r '.deploy_url' deploy-output.json", returnStdout: true).trim()
+            // }
+
             post {
                 always {
                     publishHTML([
@@ -142,13 +141,15 @@ pipeline {
                             keepAll: true,
                             reportDir: 'playwright-report',
                             reportFiles: 'index.html',
-                            reportName: 'Playwright Staging E2E Report',
+                            reportName: 'Playwright Prod E2E Report',
                             reportTitles: '',
                             useWrapperFileDirectly: true
                     ])
                 }
             }
         }
+
+
 
         stage('Approval') {
             steps {
