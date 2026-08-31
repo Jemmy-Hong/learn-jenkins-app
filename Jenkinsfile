@@ -5,6 +5,7 @@ pipeline {
         // site_id 也放到jenkins凭证，不要硬编码到代码
         NETLIFY_SITE_ID = '51ca60ee-a888-4f68-b6cb-3f513b046a1b'
         NETLIFY_AUTH_TOKEN = credentials('netlify-token')
+        REACT_APP_VERSION = '1.2.3'
     }
 
     stages {
@@ -132,10 +133,6 @@ pipeline {
                 '''
             }
 
-            // script {
-            //     env.CI_ENVIRONMENT_URL = sh(script: "npx node-jq -r '.deploy_url' deploy-output.json", returnStdout: true).trim()
-            // }
-
             post {
                 always {
                     publishHTML([
@@ -155,13 +152,13 @@ pipeline {
 
 
 
-        stage('Approval') {
-            steps {
-                timeout(time: 15, unit: 'MINUTES') {
-                    input message: 'Do you wish to deploy to production?', ok: 'Yes, I am sure!'
-                }
-            }
-        }
+        // stage('Approval') {
+        //     steps {
+        //         timeout(time: 15, unit: 'MINUTES') {
+        //             input message: 'Do you wish to deploy to production?', ok: 'Yes, I am sure!'
+        //         }
+        //     }
+        // }
 
         stage('Deploy prod') {
             agent {
