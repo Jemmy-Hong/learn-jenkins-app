@@ -127,7 +127,7 @@ pipeline {
                     npx netlify status
                     # --no-build 禁止netlify重新执行构建，直接上传本地build文件夹
                     npx netlify deploy --dir=build --json > deploy-output.json
-                    CI_ENVIRONMENT_URL=$(npx node-jq -r '.deploy_url' deploy-output.json)
+                    CI_ENVIRONMENT_URL=$(jq -r '.deploy_url' deploy-output.json)
                     PLAYWRIGHT_JUNIT_OUTPUT_FILE=test-results/playwright-results.xml npx playwright test --reporter=html,junit
                 '''
             }
