@@ -1,2 +1,2 @@
-FROM mcr.microsoft.com/playwright:v1.49.0-noble
-RUN npm install -g netlify-cli node-jq
+FROM mcr.microsoft.com/playwright:v1.39.0-jammy
+RUN npm config set registry https://registry.npmmirror.com && npm install -g netlify-cli@17.36.1 node-jq
