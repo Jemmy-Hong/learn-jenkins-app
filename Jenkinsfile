@@ -79,15 +79,13 @@ pipeline {
                 stage('E2E Tests') {
                     agent {
                         docker {
-                            image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                            image 'my-playwright'
                             reuseNode true
                         }
                     }
                     steps {
                         unstash 'build-artifact'
                         sh '''
-                            npm config set registry https://registry.npmmirror.com
-                            npm install
                             mkdir -p test-results
                             npx serve -s build -l 3000 &
                             npx wait-on http://localhost:3000
