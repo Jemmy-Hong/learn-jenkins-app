@@ -116,7 +116,7 @@ pipeline {
         stage('Deploy staging') {
             agent {
                 docker {
-                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    image 'my-playwright'
                     reuseNode true
                 }
             }
@@ -128,8 +128,6 @@ pipeline {
             steps {
                 unstash 'build-artifact'
                 sh '''
-                    npm config set registry https://registry.npmmirror.com
-                    npm install netlify-cli@17.36.1 node-jq
                     npx netlify --version
                     echo "Deploying to Staging. Site ID: ${NETLIFY_SITE_ID}"
                     npx netlify status
@@ -170,7 +168,7 @@ pipeline {
         stage('Deploy prod') {
             agent {
                 docker {
-                    image 'node:18-alpine'
+                    image 'my-playwright'
                     reuseNode true
                 }
             }
@@ -178,8 +176,6 @@ pipeline {
                 // 解压拿到build目录！！
                 unstash 'build-artifact'
                 sh '''
-                    npm config set registry https://registry.npmmirror.com
-                    npm install netlify-cli@17.36.1
                     npx netlify --version
                     echo "Deploying to Production. Site ID: ${NETLIFY_SITE_ID}"
                     npx netlify status
@@ -204,7 +200,6 @@ pipeline {
             steps {
                 unstash 'build-artifact'
                 sh '''
-                    npm config set registry https://registry.npmmirror.com
                     npm install
                     PLAYWRIGHT_JUNIT_OUTPUT_FILE=test-results/playwright-results.xml npx playwright test --reporter=html,junit
                 '''
