@@ -86,9 +86,11 @@ pipeline {
                     steps {
                         unstash 'build-artifact'
                         sh '''
+                            npm config set registry https://registry.npmmirror.com
+                            npm install
                             mkdir -p test-results
-                            npx serve -s build -l 3000 &
-                            npx wait-on http://localhost:3000
+                            serve -s build -l 3000 &
+                            wait-on http://localhost:3000
                             PLAYWRIGHT_JUNIT_OUTPUT_FILE=test-results/playwright-results.xml npx playwright test --reporter html,junit
                         '''
                     }
