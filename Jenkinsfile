@@ -10,6 +10,20 @@ pipeline {
 
     stages {
 
+        stage('Docker') {
+            steps {
+                sh '''
+                    if ! docker image inspect my-playwright >/dev/null 2>&1; then
+                        echo "my-playwright 不存在，开始构建（仅第一次）..."
+                        docker build -t my-playwright .
+                    else
+                        echo "my-playwright 已存在，跳过构建"
+                    fi
+                '''
+            }
+        }
+
+
         stage('AWS') {
             agent {
                 docker {
