@@ -197,60 +197,60 @@ pipeline {
         //     }
         // }
 
-        stage('Deploy prod') {
-            agent {
-                docker {
-                    image 'my-playwright'
-                    reuseNode true
-                }
-            }
-            steps {
-                // 解压拿到build目录！！
-                unstash 'build-artifact'
-                sh '''
-                    npx netlify --version
-                    echo "Deploying to Production. Site ID: ${NETLIFY_SITE_ID}"
-                    npx netlify status
-                    # --no-build 禁止netlify重新执行构建，直接上传本地build文件夹
-                    npx netlify deploy --dir=build --prod
-                '''
-            }
-        }
+        // stage('Deploy prod') {
+        //     agent {
+        //         docker {
+        //             image 'my-playwright'
+        //             reuseNode true
+        //         }
+        //     }
+        //     steps {
+        //         // 解压拿到build目录！！
+        //         unstash 'build-artifact'
+        //         sh '''
+        //             npx netlify --version
+        //             echo "Deploying to Production. Site ID: ${NETLIFY_SITE_ID}"
+        //             npx netlify status
+        //             # --no-build 禁止netlify重新执行构建，直接上传本地build文件夹
+        //             npx netlify deploy --dir=build --prod
+        //         '''
+        //     }
+        // }
 
-        stage('Prod E2E') {
-            agent {
-                docker {
-                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
-                    reuseNode true
-                }
-            }
+        // stage('Prod E2E') {
+        //     agent {
+        //         docker {
+        //             image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+        //             reuseNode true
+        //         }
+        //     }
 
-            environment {
-                CI_ENVIRONMENT_URL = 'https://sensational-semifreddo-386a48.netlify.app/'
-            }
+        //     environment {
+        //         CI_ENVIRONMENT_URL = 'https://sensational-semifreddo-386a48.netlify.app/'
+        //     }
 
-            steps {
-                unstash 'build-artifact'
-                sh '''
-                    npm install
-                    PLAYWRIGHT_JUNIT_OUTPUT_FILE=test-results/playwright-results.xml npx playwright test --reporter=html,junit
-                '''
-            }
-            post {
-                always {
-                    publishHTML([
-                            allowMissing: true,
-                            alwaysLinkToLastBuild: false,
-                            icon: '',
-                            keepAll: true,
-                            reportDir: 'playwright-report',
-                            reportFiles: 'index.html',
-                            reportName: 'Playwright Prod E2E Report',
-                            reportTitles: '',
-                            useWrapperFileDirectly: true
-                    ])
-                }
-            }
-        }
+        //     steps {
+        //         unstash 'build-artifact'
+        //         sh '''
+        //             npm install
+        //             PLAYWRIGHT_JUNIT_OUTPUT_FILE=test-results/playwright-results.xml npx playwright test --reporter=html,junit
+        //         '''
+        //     }
+        //     post {
+        //         always {
+        //             publishHTML([
+        //                     allowMissing: true,
+        //                     alwaysLinkToLastBuild: false,
+        //                     icon: '',
+        //                     keepAll: true,
+        //                     reportDir: 'playwright-report',
+        //                     reportFiles: 'index.html',
+        //                     reportName: 'Playwright Prod E2E Report',
+        //                     reportTitles: '',
+        //                     useWrapperFileDirectly: true
+        //             ])
+        //         }
+        //     }
+        // }
     }
 }
