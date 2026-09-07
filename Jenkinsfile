@@ -36,8 +36,12 @@ pipeline {
                     ls -la
                     node --version
                     npm --version
-                    npm config set registry https://registry.npmmirror.com
-                    npm ci
+                    npm config set registry https://mirrors.cloud.tencent.com/npm/
+                    npm config set fetch-retries 5
+                    npm config set fetch-retry-mintimeout 20000
+                    npm config set fetch-retry-maxtimeout 120000
+                    npm config set fetch-timeout 300000
+                    npm install
                     npm run build
                     ls -la
                 '''
