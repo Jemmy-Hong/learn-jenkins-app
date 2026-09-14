@@ -41,8 +41,6 @@ pipeline {
 
             steps {
                 sh '''
-                    curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-24.0.7.tgz | tar -xz -C /tmp
-                    mv /tmp/docker/docker /usr/local/bin/docker
                     docker --version
                     docker build -t myjenkinsapp .
                 '''
