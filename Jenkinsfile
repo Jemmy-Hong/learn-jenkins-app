@@ -24,7 +24,8 @@ pipeline {
                     ls -la
                     node --version
                     npm --version
-                    npm ci
+                    npm config set registry https://registry.npmmirror.com
+                    npm ci --registry=https://registry.npmmirror.com
                     npm run build
                     ls -la
                 '''
