@@ -1,7 +1,2 @@
 FROM amazon/aws-cli
-USER root
-RUN yum install -y jq curl tar && \
-curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-24.0.7.tgz -o /tmp/docker.tgz && \
-tar -xzf /tmp/docker.tgz -C /tmp && \
-mv /tmp/docker/docker /usr/local/bin/docker && \
-rm -rf /tmp/docker /tmp/docker.tgz
+RUN yum install jq -y
