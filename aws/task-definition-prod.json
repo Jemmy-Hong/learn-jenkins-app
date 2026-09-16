@@ -1,27 +1,25 @@
 {
-    "requiresCompatibilities": [
-        "FARGATE"
-    ],
-    "family": "LearnJenkinsApp-TaskDefinition-Prod",
-    "containerDefinitions": [
+  "requiresCompatibilities": ["FARGATE"],
+  "family": "LearnJenkinsApp-TaskDefinition-Prod",
+  "containerDefinitions": [
+    {
+      "name": "learnjenkinsapp",
+      "image": "650708167380.dkr.ecr.ap-southeast-1.amazonaws.com/eks-devops:learnjenkinsapp-1.0.135",
+      "portMappings": [
         {
-            "name": "learnjenkinsapp",
-            "image": "nginx:1.27-alpine",
-            "portMappings": [
-                {
-                    "name": "ngnix-80-tcp",
-                    "containerPort": 80,
-                    "hostPort": 80,
-                    "protocol": "tcp",
-                    "appProtocol": "http"
-                }
-            ],
-            "essential": true
+          "name": "ngnix-80-tcp",
+          "containerPort": 80,
+          "hostPort": 80,
+          "protocol": "tcp",
+          "appProtocol": "http"
         }
-    ],
-    "volumes": [],
-    "networkMode": "awsvpc",
-    "memory": "512",
-    "cpu": "256",
-    "executionRoleArn": ""
+      ],
+      "essential": true
+    }
+  ],
+  "volumes": [],
+  "networkMode": "awsvpc",
+  "memory": "512",
+  "cpu": "256",
+  "executionRoleArn": "arn:aws:iam::650708167380:role/ecsTaskExecutionRole"
 }
