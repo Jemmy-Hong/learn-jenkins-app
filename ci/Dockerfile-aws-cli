@@ -1,2 +1,4 @@
+FROM docker:cli AS docker-src
 FROM amazon/aws-cli
-RUN yum install jq -y
+USER root
+COPY --from=docker-src /usr/local/bin/docker /usr/local/bin/docker
